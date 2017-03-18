@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Net;
-using System.Net.Sockets;
-using System.Threading;
+﻿using System.Collections.ObjectModel;
+
 using PcapDotNet.Core;
 using PcapDotNet.Packets;
 
@@ -21,17 +17,12 @@ namespace jcPF.WPF.ViewModels
         
         public void LoadData()
         {
-
             var allDevices = LivePacketDevice.AllLocalMachine;
             Packets = new ObservableCollection<string>();
 
             PacketDevice pd = allDevices[0];
             
-            using (PacketCommunicator communicator =
-                pd.Open(65536, // portion of the packet to capture
-                    // 65536 guarantees that the whole packet will be captured on all the link layers
-                    PacketDeviceOpenAttributes.Promiscuous, // promiscuous mode
-                    1000)) // read timeout
+            using (var communicator = pd.Open(65536, PacketDeviceOpenAttributes.Promiscuous, 1000))
             {
                 do
                 {
