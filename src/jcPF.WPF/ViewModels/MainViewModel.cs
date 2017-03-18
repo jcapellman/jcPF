@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
-
+using System.Linq;
+using jcPF.WPF.Objects;
 using PcapDotNet.Core;
 using PcapDotNet.Packets;
 
@@ -14,15 +15,40 @@ namespace jcPF.WPF.ViewModels
             get { return _packets; }
             set { _packets = value; OnPropertyChanged(); }
         }
-        
+
+        private ObservableCollection<DeviceListingItem> _devices;
+
+        public ObservableCollection<DeviceListingItem> Devices
+        {
+            get { return _devices; }
+            set { _devices = value; OnPropertyChanged(); }
+        }
+
+        private DeviceListingItem _selectedDevice;
+
+        public DeviceListingItem SelectedDevice
+        {
+            get { return _selectedDevice; }
+            set { _selectedDevice = value; OnPropertyChanged(); }
+        }
+
         public void LoadData()
         {
-            var allDevices = LivePacketDevice.AllLocalMachine;
+            var devices = LivePacketDevice.AllLocalMachine;
+
+            Devices = new ObservableCollection<DeviceListingItem>(devices.Select(a => new DeviceListingItem
+            {
+                PDevice = a
+            }).ToList());            
+        }
+
+        public void RunScan()
+        {
             Packets = new ObservableCollection<string>();
 
-            PacketDevice pd = allDevices[0];
-            
-            using (var communicator = pd.Open(65536, PacketDeviceOpenAttributes.Promiscuous, 1000))
+            var pd = SelectedDevice;
+
+            using (var communicator = pd.PDevice.Open(65536, PacketDeviceOpenAttributes.Promiscuous, 1000))
             {
                 do
                 {
