@@ -34,7 +34,19 @@ namespace jcPF.WPF.ViewModels
         public DeviceListingItem SelectedDevice
         {
             get { return _selectedDevice; }
-            set { _selectedDevice = value; OnPropertyChanged(); }
+            set {
+                _selectedDevice = value;
+                OnPropertyChanged();
+                EnableScanButton = value != null;
+            }
+        }
+
+        private bool _enableScanButton;
+
+        public bool EnableScanButton
+        {
+            get { return _enableScanButton; }
+            set { _enableScanButton = value; OnPropertyChanged(); }
         }
 
         public void LoadData()
@@ -45,8 +57,7 @@ namespace jcPF.WPF.ViewModels
             {
                 PDevice = a
             }).ToList());
-
-
+            
             Packets = new ConcurrentQueue<PacketLogItem>();
         }
 
