@@ -71,6 +71,7 @@
     </ApplicationDefinition>
     <Compile Include="Managers\PacketScanning.cs" />
     <Compile Include="Objects\DeviceListingItem.cs" />
+    <Compile Include="Objects\PacketLogItem.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />

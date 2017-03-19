@@ -3,18 +3,19 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+
 using jcPF.WPF.Managers;
 using jcPF.WPF.Objects;
+
 using PcapDotNet.Core;
-using PcapDotNet.Packets;
 
 namespace jcPF.WPF.ViewModels
 {
     public class MainViewModel : BaseViewModel
     {
-        private ConcurrentQueue<string> _packets;
+        private ConcurrentQueue<PacketLogItem> _packets;
 
-        public ConcurrentQueue<string> Packets
+        public ConcurrentQueue<PacketLogItem> Packets
         {
             get { return _packets; }
             set { _packets = value; OnPropertyChanged(); }
@@ -46,7 +47,7 @@ namespace jcPF.WPF.ViewModels
             }).ToList());
 
 
-            Packets = new ConcurrentQueue<string>();
+            Packets = new ConcurrentQueue<PacketLogItem>();
         }
 
         public async Task<bool> RunScan()
@@ -59,11 +60,11 @@ namespace jcPF.WPF.ViewModels
             return await scanner.RunScan(cToken, SelectedDevice.PDevice);
         }
 
-        private void Scanner_NewPacketEntry(object sender, string e)
+        private void Scanner_NewPacketEntry(object sender, PacketLogItem e)
         {
             Packets.Enqueue(e);
 
-            Packets = new ConcurrentQueue<string>(Packets);
+            Packets = new ConcurrentQueue<PacketLogItem>(Packets);
         }
     }
 }

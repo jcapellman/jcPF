@@ -12,5 +12,15 @@
             <Setter Property="WindowStyle" Value="None" />
             <Setter Property="Background" Value="{StaticResource BackgroundColor}" />
         </Style>
+        
+        <Style TargetType="ListViewItem" x:Key="PacketGrid">
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+        
+        <Style TargetType="GridViewColumnHeader" x:Key="PacketGridHeader">
+            <Setter Property="Background" Value="Black" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
     </Application.Resources>
 </Application>

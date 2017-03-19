@@ -2,6 +2,8 @@
 using System.Threading;
 using System.Threading.Tasks;
 
+using jcPF.WPF.Objects;
+
 using PcapDotNet.Core;
 using PcapDotNet.Packets;
 
@@ -9,9 +11,9 @@ namespace jcPF.WPF.Managers
 {
     public class PacketScanning
     {
-        public event EventHandler<string> NewPacketEntry;
+        public event EventHandler<PacketLogItem> NewPacketEntry;
 
-        public void OnNewPacketEntry(string e)
+        public void OnNewPacketEntry(PacketLogItem e)
         {
             NewPacketEntry?.Invoke(null, e);
         }
@@ -36,7 +38,15 @@ namespace jcPF.WPF.Managers
                                         continue;
                                     }
 
-                                    OnNewPacketEntry(packet.Length.ToString());
+                                    var packetItem = new PacketLogItem
+                                    {
+                                        Destination = packet.IpV4.Destination.ToString(),
+                                        Size = packet.Length,
+                                        Source = packet.IpV4.Source.ToString(),
+                                        TimeStamp = DateTime.Now
+                                    };
+
+                                    OnNewPacketEntry(packetItem);
 
                                     break;
                             }
