@@ -28,5 +28,10 @@ namespace jcPF.WPF
         {
             Application.Current.Shutdown();
         }
+
+        private async void BtnStartMonitoring_OnClick(object sender, RoutedEventArgs e)
+        {
+            var result = await viewModel.RunScan();
+        }
     }
 }

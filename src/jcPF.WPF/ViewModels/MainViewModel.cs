@@ -1,5 +1,9 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Concurrent;
+using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using jcPF.WPF.Managers;
 using jcPF.WPF.Objects;
 using PcapDotNet.Core;
 using PcapDotNet.Packets;
@@ -8,9 +12,9 @@ namespace jcPF.WPF.ViewModels
 {
     public class MainViewModel : BaseViewModel
     {
-        private ObservableCollection<string> _packets;
+        private ConcurrentQueue<string> _packets;
 
-        public ObservableCollection<string> Packets
+        public ConcurrentQueue<string> Packets
         {
             get { return _packets; }
             set { _packets = value; OnPropertyChanged(); }
@@ -39,36 +43,27 @@ namespace jcPF.WPF.ViewModels
             Devices = new ObservableCollection<DeviceListingItem>(devices.Select(a => new DeviceListingItem
             {
                 PDevice = a
-            }).ToList());            
+            }).ToList());
+
+
+            Packets = new ConcurrentQueue<string>();
         }
 
-        public void RunScan()
+        public async Task<bool> RunScan()
         {
-            Packets = new ObservableCollection<string>();
+            var scanner = new PacketScanning();
 
-            var pd = SelectedDevice;
+            var cToken = new CancellationToken();
 
-            using (var communicator = pd.PDevice.Open(65536, PacketDeviceOpenAttributes.Promiscuous, 1000))
-            {
-                do
-                {
-                    Packet packet;
+            scanner.NewPacketEntry += Scanner_NewPacketEntry;
+            return await scanner.RunScan(cToken, SelectedDevice.PDevice);
+        }
 
-                    var result = communicator.ReceivePacket(out packet);
+        private void Scanner_NewPacketEntry(object sender, string e)
+        {
+            Packets.Enqueue(e);
 
-                    switch (result)
-                    {
-                        case PacketCommunicatorReceiveResult.Ok:
-                            if (packet.IpV4 == null)
-                            {
-                                continue;
-                            }
-
-                            Packets.Add(packet.IpV4.Destination.ToString());
-                            break;
-                    }
-                } while (true);
-            }
+            Packets = new ConcurrentQueue<string>(Packets);
         }
     }
 }
