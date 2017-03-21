@@ -18,46 +18,43 @@ namespace jcPF.WPF.Managers
             NewPacketEntry?.Invoke(null, e);
         }
 
-        public async Task<bool> RunScan(CancellationToken token, PacketDevice pd)
+        public async Task<bool> RunScan(CancellationTokenSource token, PacketDevice pd)
         {
             return await Task.Run(() =>
+            {
+                using (var communicator = pd.Open(65536, PacketDeviceOpenAttributes.Promiscuous, 1000))
                 {
-                    using (var communicator = pd.Open(65536, PacketDeviceOpenAttributes.Promiscuous, 1000))
+                    do
                     {
-                        do
+                        Packet packet;
+
+                        var result = communicator.ReceivePacket(out packet);
+
+                        switch (result)
                         {
-                            Packet packet;
+                            case PacketCommunicatorReceiveResult.Ok:
+                                if (packet.IpV4 == null)
+                                {
+                                    continue;
+                                }
 
-                            var result = communicator.ReceivePacket(out packet);
+                                var packetItem = new PacketLogItem
+                                {
+                                    Destination = packet.IpV4.Destination.ToString(),
+                                    Size = packet.Length,
+                                    Source = packet.IpV4.Source.ToString(),
+                                    TimeStamp = DateTime.Now
+                                };
 
-                            switch (result)
-                            {
-                                case PacketCommunicatorReceiveResult.Ok:
-                                    if (packet.IpV4 == null)
-                                    {
-                                        continue;
-                                    }
+                                OnNewPacketEntry(packetItem);
 
-                                    var packetItem = new PacketLogItem
-                                    {
-                                        Destination = packet.IpV4.Destination.ToString(),
-                                        Size = packet.Length,
-                                        Source = packet.IpV4.Source.ToString(),
-                                        TimeStamp = DateTime.Now
-                                    };
+                                break;
+                        }
+                    } while (true);
 
-                                    OnNewPacketEntry(packetItem);
-
-                                    break;
-                            }
-
-                            if (token.IsCancellationRequested)
-                            {
-                                return false;
-                            }
-                        } while (true);
-                    }
-                }, token);
+                    return true;
+                }
+            }, token.Token);
         }
     }
 }

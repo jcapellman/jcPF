@@ -33,5 +33,10 @@ namespace jcPF.WPF
         {
             var result = await viewModel.RunScan();
         }
+
+        private void BtnCancelMonitoring_OnClick(object sender, RoutedEventArgs e)
+        {
+            viewModel.CancelScan();
+        }
     }
 }
