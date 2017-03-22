@@ -10,6 +10,12 @@
         <Style TargetType="Window" x:Key="MainWindow">
             <Setter Property="AllowsTransparency" Value="True" />
             <Setter Property="WindowStyle" Value="None" />
+            <Setter Property="MinWidth" Value="740" />
+            <Setter Property="MaxWidth" Value="740" />
+            <Setter Property="Width" Value="740" />
+            <Setter Property="MinHeight" Value="480" />
+            <Setter Property="Height" Value="480" />
+            <Setter Property="ResizeMode" Value="CanResizeWithGrip" />
             <Setter Property="Background" Value="{StaticResource BackgroundColor}" />
         </Style>
         

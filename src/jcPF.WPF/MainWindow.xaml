@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:jcPF.WPF"
         xmlns:viewModels="clr-namespace:jcPF.WPF.ViewModels"
         Style="{StaticResource MainWindow}"
-        mc:Ignorable="d" Title="jcPF" Height="480" Width="640">
+        mc:Ignorable="d" Title="jcPF">
     <Window.DataContext>
         <viewModels:MainViewModel />
     </Window.DataContext>
