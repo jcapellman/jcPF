@@ -48,7 +48,9 @@
                 <GridView AllowsColumnReorder="True" ColumnHeaderContainerStyle="{StaticResource PacketGridHeader}">
                     <GridViewColumn Header="Timestamp" Width="130" DisplayMemberBinding="{Binding Path=TimeStamp}" />
                     <GridViewColumn Header="Source" Width="120" DisplayMemberBinding="{Binding Path=Source}" />
+                    <GridViewColumn Header="Source Port" Width="120" DisplayMemberBinding="{Binding Path=SourcePort}" />
                     <GridViewColumn Header="Destination" Width="120" DisplayMemberBinding="{Binding Path=Destination}" />
+                    <GridViewColumn Header="Destination Port" Width="120" DisplayMemberBinding="{Binding Path=DestinationPort}" />
                     <GridViewColumn Header="Size of Packet" Width="100" DisplayMemberBinding="{Binding Path=Size}" />
                 </GridView>
             </ListView.View>

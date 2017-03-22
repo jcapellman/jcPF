@@ -6,6 +6,8 @@ using jcPF.WPF.Objects;
 
 using PcapDotNet.Core;
 using PcapDotNet.Packets;
+using PcapDotNet.Packets.IpV4;
+using PcapDotNet.Packets.Transport;
 
 namespace jcPF.WPF.Managers
 {
@@ -18,12 +20,25 @@ namespace jcPF.WPF.Managers
             NewPacketEntry?.Invoke(null, e);
         }
 
+        private static void PacketHandler(Packet packet)
+        {
+            IpV4Datagram ip = packet.Ethernet.IpV4;
+            UdpDatagram udp = ip.Udp;
+            
+            Console.WriteLine(ip.Source + ":" + udp.SourcePort + " -> " + ip.Destination + ":" + udp.DestinationPort);
+        }
+
         public async Task<bool> RunScan(CancellationTokenSource token, PacketDevice pd)
         {
             return await Task.Run(() =>
             {
                 using (var communicator = pd.Open(65536, PacketDeviceOpenAttributes.Promiscuous, 1000))
                 {
+                    using (var filter = communicator.CreateFilter("ip and udp"))
+                    {                 
+                        communicator.SetFilter(filter);
+                    }
+                    
                     do
                     {
                         Packet packet;
@@ -38,11 +53,16 @@ namespace jcPF.WPF.Managers
                                     continue;
                                 }
 
+                                var ip = packet.Ethernet.IpV4;
+                                var udp = ip.Udp;
+
                                 var packetItem = new PacketLogItem
                                 {
-                                    Destination = packet.IpV4.Destination.ToString(),
+                                    Destination = ip.Destination.ToString(),
+                                    DestinationPort = udp.DestinationPort,
                                     Size = packet.Length,
-                                    Source = packet.IpV4.Source.ToString(),
+                                    Source = ip.Source.ToString(),
+                                    SourcePort = udp.SourcePort,
                                     TimeStamp = DateTime.Now
                                 };
 

@@ -6,7 +6,11 @@ namespace jcPF.WPF.Objects
     {
         public string Source { get; set; }
 
+        public int SourcePort { get; set; }
+
         public string Destination { get; set; }
+
+        public int DestinationPort { get; set; }
 
         public int Size { get; set; }
 
