@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-
+using jcPF.WPF.DAL;
 using jcPF.WPF.Objects;
 
 using PcapDotNet.Core;
@@ -19,18 +19,10 @@ namespace jcPF.WPF.Managers
         {
             NewPacketEntry?.Invoke(null, e);
         }
-
-        private static void PacketHandler(Packet packet)
-        {
-            IpV4Datagram ip = packet.Ethernet.IpV4;
-            UdpDatagram udp = ip.Udp;
-            
-            Console.WriteLine(ip.Source + ":" + udp.SourcePort + " -> " + ip.Destination + ":" + udp.DestinationPort);
-        }
-
+        
         public async Task<bool> RunScan(CancellationTokenSource token, PacketDevice pd)
         {
-            return await Task.Run(() =>
+            return await Task.Run(async () =>
             {
                 using (var communicator = pd.Open(65536, PacketDeviceOpenAttributes.Promiscuous, 1000))
                 {
@@ -38,7 +30,9 @@ namespace jcPF.WPF.Managers
                     {                 
                         communicator.SetFilter(filter);
                     }
-                    
+
+                    var packetTable = new PacketTable();
+
                     do
                     {
                         Packet packet;
@@ -67,6 +61,8 @@ namespace jcPF.WPF.Managers
                                 };
 
                                 OnNewPacketEntry(packetItem);
+
+                                await packetTable.WritePacketAsync(packetItem);
 
                                 break;
                         }
