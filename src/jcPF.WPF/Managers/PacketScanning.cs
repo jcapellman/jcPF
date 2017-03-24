@@ -66,6 +66,11 @@ namespace jcPF.WPF.Managers
 
                                 break;
                         }
+
+                        if (token.IsCancellationRequested)
+                        {
+                            return true;
+                        }
                     } while (true);
 
                     return true;
